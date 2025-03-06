@@ -1,0 +1,64 @@
+<odoo>
+    <!--    inherit contact form-->
+    <record id="view_partner_form_inherited_connex" model="ir.ui.view">
+        <field name="name">partner.customer.form.inherited</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <!--            add type end customer after vat field-->
+            <xpath expr="//div[@class='o_address_format']" position="after">
+                <field name="is_end_customer"/>
+                <field name="middle_rate_applicable"/>
+                <field name="svat_no" string="SVAT #"/>
+                <field name="br_number" string="BR Number"/>
+            </xpath>
+            <!--    con-1254-->
+            <xpath expr="//field[@name='email']" position="replace">
+                <field name="email" widget="email" context="{'gravatar_image': True}"/>
+            </xpath>
+            <xpath expr="//field[@name='user_ids']" position="replace">
+                <field name="user_ids" required="false" invisible="true"/>
+            </xpath>
+
+
+        </field>
+    </record>
+
+     <record id="view_partner_form_inherited_vat_name" model="ir.ui.view">
+        <field name="name">partner.customer.form.inherited</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base_vat.view_partner_base_vat_form"/>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//label[@for='vat']" position="replace">
+                <label for="vat" string="VAT#"/>
+            </xpath>
+        </field>
+     </record>
+
+    <record id="end_customer_view_search" model="ir.ui.view">
+            <field name="name">end.customer.search.inherit</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="account.res_partner_view_search"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='supplier']" position="after">
+                    <filter name="is_end_customer" string="End Customer" domain="[('is_end_customer','=', 'true') ]"/>
+                    <filter name="is_partner" string="Partner" domain="[('is_end_customer', '=', False)]"/>
+
+                </xpath>
+            </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="end_customer_view">
+        <field name="name">End Customers</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="domain">[('is_end_customer','=',1)]</field>
+        <field name="context">{'res_partner_search_mode': 'customer','default_is_end_customer':1}</field>
+        <field name="search_view_id" ref="base.view_res_partner_filter"/>
+    </record>
+    <menuitem id="end_customer_menu" name="End Customer"
+              parent="sale.sale_order_menu" sequence="15" action="connex_end_customer.end_customer_view"/>
+
+</odoo>
